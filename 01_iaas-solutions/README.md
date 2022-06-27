@@ -60,6 +60,38 @@ Azure ARM is the deployment and management service for provisioning, updating, d
 Azure ARM template is a JSON based template, which you can create and manage any kind of resources in azure in a declarative and automation way, rathar than manuel via Portal.
 
 ## Manages container images in Azure Container Registry (ACR)
+ACR is a managed and private Docker registry service based on open-source Docker Registry 2.0 for storing and managing  container images. This service can be used either for existing container development and deployment pipelines, or to build container images in Azure.
+ACR can include both Windows and Linux images. In addition to Docker container images, ACR stores related content formats such as Helm charts and images built to the Open Container Initiative (OCI) Image Format Specification.
 
-## Run container images in Azure Container Instances
+### ACR service tiers:
+- **Basic:** A cost-optimized tier with the same capabilities like Standard abd Premium, but with lower storage and image throughput. Suitable for dev, test, and learning scenarios.
+- **Standard:** Same capabilities as Basic, with increased storage and image throughput. Suitable for the most  production scenarios.
+- **Premium:** Provides the highest amount of storage and concurrent operations, enabling high-volume scenarios. In addition to higher image throughput, Premium adds features such as geo-replication for managing a single registry across multiple regions, content trust for image tag signing, and private link with private endpoints to restrict access to the registry.
+
+### Create an ACR with Azure CLI:
+```
+Create an ACR with Azure CLI:
+az acr create \
+    --resource-group rg-az204 \
+    --name acrtestaz204 \
+    --sku Basic
+```
+
+#### Create a Dockerfile for a sample hello-world image
+```
+echo FROM mcr.microsoft.com/hello-world > Dockerfile
+```
+
+#### Push the sample hello-world image to the created ACR
+```
+az acr build --image sample/hello-world:v1 \
+    --registry acrtestaz204 \
+    --file Dockerfile .
+```
+
+### Create an ACR with Terraform
+[Terraform](Terraform)
+
+
+## Run container images in Azure Container Instances (ACI)
 
