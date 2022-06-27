@@ -90,7 +90,7 @@ az acr build --image sample/hello-world:v1 \
 ```
 
 ### Create an ACR with Terraform
-[Terraform](Terraform)
+[Terraform](Terraform/main.tf)
 
 
 ## Run container images in Azure Container Instances (ACI)
