@@ -53,11 +53,22 @@ az vm create \
 
 
 ## Create and deploy Azure Resource Manager (ARM) templates
-Azure ARM is the deployment and management service for provisioning, updating, deleting, and managing Azure resources in a subscription.
+Azure ARM is the deployment and management service for provisioning, updating, deleting, and managing Azure resources in a subscription. No matter if you're using the Portal or Azure CLI, PowerShell, or any Infrastructure as Code (IaC) framework all of them going to communicate with ARM to provision, update, and mange resources in Azure.
 
-![Azure ARM](../arm-sdks.png)
+![Azure ARM](./../00_images/arm-sdks.png)
 
-Azure ARM template is a JSON based template, which you can create and manage any kind of resources in azure in a declarative and automation way, rathar than manuel via Portal.
+Azure ARM template is a JSON based template, which is used for creating and managing any kind of resources in Azure in a declarative and automation way, rathar than manuel via Portal.
+
+An ARM template has basicly following components:
+- **Parameters:** Provide values during deployment that allow the same template to be used with different environments. Parameters are used commonly for changed configuration elements e.g VM names, VNET names, storage account names, etc.
+- **Variables:** Define values that are reused in your templates. They can be constructed from parameter values.
+- **functions:** Create customized functions that simplify your template.
+- **Resources:** Specify the resources to deploy, e.g. VM, VNET, etc.
+- **Outputs:** Return values from the deployed resources, e.g. storage account ID.
+
+You can find dozen of ARM templates examples and quickstart templates on [Azure Quickstart Templates](https://github.com/Azure/azure-quickstart-templates) GitHub.
+
+You can share your template with other users or within an organization using [Template specs](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-specs?tabs=azure-powershell) and store your templates as a resource type.
 
 ## Manages container images in Azure Container Registry (ACR)
 ACR is a managed and private Docker registry service based on open-source Docker Registry 2.0 for storing and managing  container images. This service can be used either for existing container development and deployment pipelines, or to build container images in Azure.
