@@ -51,6 +51,7 @@ az vm create \
     --admin-username vm-testuser
 ```
 
+---
 
 ## Create and deploy Azure Resource Manager (ARM) templates
 Azure ARM is the deployment and management service for provisioning, updating, deleting, and managing Azure resources in a subscription. No matter if you're using the Portal or Azure CLI, PowerShell, or any Infrastructure as Code (IaC) framework all of them going to communicate with ARM to provision, update, and mange resources in Azure.
@@ -70,8 +71,26 @@ You can find dozen of ARM templates examples and quickstart templates on [Azure 
 
 You can share your template with other users or within an organization using [Template specs](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-specs?tabs=azure-powershell) and store your templates as a resource type.
 
-## Manages container images in Azure Container Registry (ACR)
-ACR is a managed and private Docker registry service based on open-source Docker Registry 2.0 for storing and managing  container images. This service can be used either for existing container development and deployment pipelines, or to build container images in Azure.
+---
+
+## Exkurs: What's Container?
+Containerizing of an app allows you to package up your app binaries, libaries, and all required components of an app to run into a single binary file called container image. A container is a running instance of an image and inside this container is your running app. You can create any number of containers from an image. 
+
+The software that manages the provisioning of containers on the container host (e.g. your computer) is called container engine (e.g. Docker Engine).
+
+You can share yourt image with others using a container registry. A container registry is simply like a database where you can push and pull container images.
+
+### Container vs. VM
+A container is simply a process running on the container host (e.g. your personal computer).If you stop this process, the container is terminated immediately.
+A VM is simulation of a computer which looks exactly the same like a physical computer. It means for a VM you need to install an Operating System (OS), configure stoarge, CPU, etc. everyting what you need for your physical hardware.
+Unlike VM for a container, there is no need to install and configure an OS. To create a container, you only need all the application components you need to run it.
+
+![Container vs. VM](../00_images/container-fundamentals.png)
+
+---
+
+## Manage container images in Azure Container Registry (ACR)
+ACR is a managed and private Docker container registry based on open-source Docker Registry 2.0 for storing and managing  container images. This service can be used either for existing container development and deployment pipelines, or to build container images in Azure.
 ACR can include both Windows and Linux images. In addition to Docker container images, ACR stores related content formats such as Helm charts and images built to the Open Container Initiative (OCI) Image Format Specification.
 
 ### ACR service tiers:
@@ -79,30 +98,59 @@ ACR can include both Windows and Linux images. In addition to Docker container i
 - **Standard:** Same capabilities as Basic, with increased storage and image throughput. Suitable for the most  production scenarios.
 - **Premium:** Provides the highest amount of storage and concurrent operations, enabling high-volume scenarios. In addition to higher image throughput, Premium adds features such as geo-replication for managing a single registry across multiple regions, content trust for image tag signing, and private link with private endpoints to restrict access to the registry.
 
-### Create an ACR with Azure CLI:
+### ACR authentication:
+ACR needs authentication for all operations, e.g. pulling an image from ACI. ACR supports 2 types of identities for logging in:
+- **AAD identities:** Users, Service Principals
+- **ACR Admin:** Administration account used for specific scenarios. Disables per default.
+
+For running of the operations (or authorization) in ACR there's Role-based access control (RBAC) roles, e.g. acrpull.
+
+---
+
+## Run container images in Azure Container Instances (ACI)
+ACI offers the fastest and simplest way to run a container in Azure, without having to manage any VM or any infrastructure resources. Just pull your image from any container registry and then build and run your container on ACI
+
+![Container in Azure](../00_images/container-in-azure.png)
+
+---
+
+## Demo: Create, push, and pull an image, and build a container in Azure
+### Create a Dockerfile for a sample hello-world image
 ```
-Create an ACR with Azure CLI:
+echo FROM mcr.microsoft.com/hello-world > Dockerfile
+```
+### Create a Resource Group:
+```
+az group create \
+    --name rg-az204 \
+    --location northeurope
+```
+### Create an ACR:
+```
 az acr create \
     --resource-group rg-az204 \
     --name acrtestaz204 \
     --sku Basic
 ```
-
-#### Create a Dockerfile for a sample hello-world image
-```
-echo FROM mcr.microsoft.com/hello-world > Dockerfile
-```
-
-#### Push the sample hello-world image to the created ACR
+### Push the sample hello-world image to the ACR
 ```
 az acr build --image sample/hello-world:v1 \
     --registry acrtestaz204 \
     --file Dockerfile .
 ```
+### Create an ACI:
+```
+az container create \
+    --resource-group rg-az204 \
+    --name acitestaz204 \
+    --dns-name aci-test-az204 \
+    --ports 80 \
+    --image acrtestaz204.azurecr.io/sample/hello-world:v1
+```
+Note: You're going to be asked for registry-username and registry-password. You can find this credential on Portal --> ACR --> Access keys --> enable Admin user.
 
-### Create an ACR with Terraform
-[Terraform](Terraform/main.tf)
-
-
-## Run container images in Azure Container Instances (ACI)
-
+### Retrieve the URL
+```
+URL=$(az container show --resource-group 'rg-az204' --name 'acitestaz204' --query ipAddress.fqdn | tr -d '"')
+echo "http://$URL"
+```
