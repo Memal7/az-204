@@ -154,3 +154,7 @@ Note: You're going to be asked for registry-username and registry-password. You 
 URL=$(az container show --resource-group 'rg-az204' --name 'acitestaz204' --query ipAddress.fqdn | tr -d '"')
 echo "http://$URL"
 ```
+
+### For more demos about container look at to these repositories:
+- [Docker Container](https://github.com/Memal7/docker-container)
+- [Container & AKS](https://github.com/Memal7/container-aks)
